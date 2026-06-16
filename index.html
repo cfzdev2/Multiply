@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>  
+    <title>Multiply</title>
+</head>
+<body>
+    <aside class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 20L10 14L14 18L20 10M20 10H15M20 10V15" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M4 14L8 10L12 13L16 8M16 8H12M16 8V12" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/>
+            </svg>
+            <span class="logo-text">Mult<span class="logo-accent">iply</span></span>
+        </div>
+        <nav class="nav-buttons">
+            <h5>Dashboard</h5>
+            <button class="nav-btn active" onclick="switchTab('reports')">Reports</button>
+            <button class="nav-btn" onclick="switchTab('inventory')">Inventory</button>
+            <button class="nav-btn" onclick="switchTab('sales')">Sales</button>
+            <br>
+            <h5>Customize</h5>
+            <button class="nav-btn" onclick="switchTab('settings')">Settings</button>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <section id="sales" class="content-section">
+            <h1>Sales</h1>
+            <p>Sprzedane itemy</p>
+            
+            <div class="sales-layout">
+                <div id="sales-display" class="items-container"></div>
+                <div class="total-profit-box">
+                    <h3>Ogólny zysk</h3>
+                    <span id="total-profit-value">0 zł</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="inventory" class="content-section" >
+            <section id="inventory-section">
+                <h1>Inventory</h1>
+                <p>Tu są wszystkie itemy</p>
+                
+                <h3 class="group-title" style="color: white;">Aktywne:</h3>
+                <div id="active-items-display" class="items-container"></div>
+                
+                <h3 class="group-title" style="color: #10b981;">Sprzedane:</h3>
+                <div id="sold-items-display" class="items-container"></div>
+            </section>  
+            <br><button id="add-btn" onclick="AddItem()">Add item</button>
+            
+            <section id="add-section" style="display: none;">
+                <h1>Add an item</h1><br>
+
+                <div class="form-group">
+                    <label>Nazwa przedmiotu:</label>
+                    <input type="text" id="item-name" placeholder="np. Iphone 15">
+                </div>
+
+                <div class="form-group">
+                    <label>Kwota zakupu:</label>
+                    <input type="number" id="item-price" placeholder="np. 800">
+                </div>
+
+                <div class="form-group">
+                    <label>Zdjęcie przedmiotu:</label>
+                    <input type="file" id="item-image" accept="image/*">
+                </div>
+            </section>
+            <div id="insideButtons">
+            <button id="add" style="display: none;" onclick="InsideAddButton()">Add</button>
+            <button id="cancel" style="display: none;" onclick="cancelButton()">Cancel</button>
+            </div>  
+        </section>
+
+        <section id="reports" class="content-section active">
+            <h1>Reports</h1>
+            <p>Podsumowanie finansowe, łączny zysk oraz analiza obrotu aplikacji Multiply.</p>
+
+            <div class="reports-container">
+                <div class="report-card card-left">
+                    <h3>Ostanie sprzedaże</h3>
+                    <div id="recent-sales-list" class="recent-sales-list">
+                    </div>
+                </div>
+                
+                <div class="report-card card-center">
+                    <div class="chart-controls">
+                        <div class="control-group">
+                            <button class="chart-btn type-btn active" onclick="changeChartType('profit')">Tylko Zysk</button>
+                            <button class="chart-btn type-btn" onclick="changeChartType('sales')">Tylko Sprzedaż</button>
+                        </div>
+                        <div class="control-group">
+                            <button class="chart-btn time-btn" onclick="changeTimePeriod('1h')">1h</button>
+                            <button class="chart-btn time-btn active" onclick="changeTimePeriod('24h')">24h</button>
+                            <button class="chart-btn time-btn" onclick="changeTimePeriod('3d')">3 dni</button>
+                            <button class="chart-btn time-btn" onclick="changeTimePeriod('7d')">7 dni</button>
+                            <button class="chart-btn time-btn" onclick="changeTimePeriod('1m')">1 msc</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-wrapper">
+                        <canvas id="multiplyChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="report-card card-right">
+                    <h3>Statystyki Portfolio</h3>
+                    <div class="empty-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#4b5563" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="16"></line>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        <p>Miejsce na Twój kolejny pomysł</p>
+                        <span>(np. najlepsi klienci, top kategorie lub cele finansowe)</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+
+
+        
+        <section id="settings" class="content-section">
+            <h1>Settings</h1>
+            <p>Motyw</p><br>
+            <div id="motywButtons">
+                <button id="jasny" style="background-color: #f3f4f6; color: #000; padding: 10px 20px; border: 1px solid #111827; border-radius: 6px; font-weight: bold; cursor: pointer;" onclick="whiteMotyw()">Jasny Motyw</button>
+                <button id="ciemny" style="background-color: #111827; color: #fff; padding: 10px 20px; border: 1px solid #374151; border-radius: 6px; font-weight: bold; cursor: pointer;"  onclick="blackMotyw()">Ciemny Motyw</button>
+            </div>
+
+            
+        </section>
+    </main>
+</body>
+</html>
